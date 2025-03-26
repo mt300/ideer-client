@@ -1,18 +1,47 @@
 import React, { useState, useEffect } from 'react';
+// import { set } from 'react-hook-form';
 
 const IdeaCard = ({ idea, handleHide }) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [editedText, setEditedText] = useState(idea.content);
+  const [editedText, setEditedText] = useState(idea.edit??idea.content);
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
-    console.log('IdeaCard', idea);
-    setEditedText(idea.content);
+    // console.log('IdeaCard', idea);
+    setEditedText(idea.edit ?? idea.content);
   }, [idea]);
   const handleEdit = () => {
     if (isEditing) {
       // Salva as alterações
-      idea.content = editedText;
+      const updatedIdea = { ...idea, edit: editedText };
+      idea.edit = editedText;
+      // idea.edit = editedText;
+      setLoading(true);
+      fetch(`${import.meta.env.VITE_BACKEND_URL}/ideas/edit/${idea.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+        },
+        body: JSON.stringify({ ...updatedIdea }),
+      })
+        .then((response) => {
+          if(!response.ok){
+            // console.log('Erro salvando',response.text);
+            throw new Error('Erro ao salvar a ideia');
+          }
+          response.json()
+          // console.log('response',response);
+        })
+        .catch((error) => {
+          console.error('Error:', error);
+        }).finally(() => {
+          setLoading(false)
+          setIsEditing(!isEditing);
+        });
+    }else	{
+      setIsEditing(!isEditing);
     }
-    setIsEditing(!isEditing);
   };
 
   return (
@@ -39,7 +68,7 @@ const IdeaCard = ({ idea, handleHide }) => {
       </div>
 
       <div className="card-footer">
-        <button onClick={handleEdit}>{isEditing ? 'Salvar' : 'Editar'}</button>
+        <button onClick={handleEdit}>{loading? "Salvando..." : (isEditing ? 'Salvar' : 'Editar')}</button>
         <button onClick={() => handleHide(idea.id)}>Esconder</button>
       </div>
     </div>
@@ -86,7 +115,7 @@ const IdeasSection = (props) => {
     );
   };
   useEffect(()=>{
-    console.log(props)
+    // console.log(props)
     setIdeas(ideasProps);
   },[ideasProps,props]);
   return (

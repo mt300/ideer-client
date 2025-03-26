@@ -14,6 +14,7 @@ export default function IdeaGeneratorTool(props) {
     const [loading, setLoading] = useState(false);
 
     const onToggleCategory = () => {
+        setCustomCategory('');
         setExistingCategory(!existingCategory);
     };
     const onSubmit = async (data) => {
@@ -48,10 +49,11 @@ export default function IdeaGeneratorTool(props) {
                 
                 {/* Nome da Plataforma */}
                 <div>
-                <label htmlFor="platform" className="block text-sm font-medium ">Plataforma ou Rede Social</label>
+                <label htmlFor="platform" className="block text-sm font-medium ">Plataforma ou Rede Social </label>
                 <input
                     id="platform"
                     type="text"
+                    placeholder='instagram, tiktok, linkedin...'
                     {...register('platform', { required: 'Este campo é obrigatório' })}
                     className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
@@ -77,6 +79,7 @@ export default function IdeaGeneratorTool(props) {
                     type="text"
                     {...register('category', { required: 'Selecione ou adicione uma categoria' })}
                     value={customCategory}
+                    placeholder='Digite a categoria customizada'
                     onChange={(e) => setCustomCategory(e.target.value)}
                     className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
